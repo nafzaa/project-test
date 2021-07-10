@@ -42,13 +42,13 @@ void mysensor(){
   valuesensor = digitalRead (irflamesensor);
 
   if (valuesensor == LOW && state2 == 0){
-    digitalWrite(relay, LOW);
+    digitalWrite(relay, HIGH);
     Blynk.notify("fire.......fire........");
     state2 = 1;
     }
 
   if (valuesensor == HIGH){
-    digitalWrite(relay, HIGH);
+    digitalWrite(relay, LOW);
     state2 = 0;
     }
 
@@ -92,8 +92,6 @@ void setup()
   dht.begin();
   pinMode(relay, OUTPUT);
   pinMode(irflamesensor, INPUT);
-
-  digitalWrite(relay, HIGH);
 
   Blynk.begin(auth, ssid, pass);
   // You can also specify server:
