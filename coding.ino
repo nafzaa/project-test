@@ -6,6 +6,16 @@
 
 #define DHTTYPE DHT11
 
+int relay = D2;
+
+int irflamesensor = D5;
+
+int valuesensor = 0;
+
+int state = 0;
+int state1 = 0;
+int state2 = 0;
+
 DHT dht(DHTPIN, DHTTYPE);
 
 /* Fill-in your Template ID (only if using Blynk.Cloud) */
@@ -28,8 +38,48 @@ BlynkTimer timer;
 
 void mysensor(){
   float h = dht.readHumidity();
-  
   float t = dht.readTemperature();
+  valuesensor = digitalRead (irflamesensor);
+
+  if (valuesensor == LOW && state2 == 0){
+    digitalWrite(relay, LOW);
+    Blynk.notify("fire.......fire........");
+    state2 = 1;
+    }
+
+  if (valuesensor == HIGH){
+    digitalWrite(relay, HIGH);
+    state2 = 0;
+    }
+
+  if (h >= 0 && h <= 50){
+    if(state == 0){
+      Blynk.notify("Low Humidity");
+      state = 1;
+      }
+    }
+
+  if (h >= 80 && h <= 100){
+    if(state == 0){
+      Blynk.notify("Too High Humidity");
+      state = 1;
+      }
+    }
+
+  if (h >= 50 && h <= 79){
+    state = 0;
+    }
+
+  if (t >= 36){
+    if (state1 == 0){
+     Blynk.notify("Too hot");
+     state1 = 1;
+    }
+   }
+
+  else{
+    state1 = 0;
+    } 
 
   Blynk.virtualWrite(V0, h);
   Blynk.virtualWrite(V1, t);
@@ -40,6 +90,10 @@ void setup()
   // Debug console
   Serial.begin(9600);
   dht.begin();
+  pinMode(relay, OUTPUT);
+  pinMode(irflamesensor, INPUT);
+
+  digitalWrite(relay, HIGH);
 
   Blynk.begin(auth, ssid, pass);
   // You can also specify server:
